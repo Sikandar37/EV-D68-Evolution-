@@ -163,15 +163,41 @@ The resulting `EVD68.json` file can be visualized using Auspice:
 - Explore phylogeny, temporal dynamics, geographic spread, and mutations
 
 ---
-
-# Workflow Summary
+# 9. Workflow Summary
 
 ```
-Sequences → Alignment → IQ-TREE → Time Tree → Traits → Ancestral Reconstruction
-→ Amino Acid Changes → Auspice Export → Visualization
+Genome sequences
+       │
+       ▼
+Multiple sequence alignment
+       │
+       ▼
+IQ-TREE Model Selection
+       │
+       ▼
+Maximum Likelihood Tree
+       │
+       ▼
+Augur Refine
+(Time-calibrated tree)
+       │
+       ├─────────────┐
+       ▼             ▼
+Trait inference   Ancestral sequences
+       │             │
+       └──────┬──────┘
+              ▼
+Amino acid mutations
+              │
+              ▼
+Augur Export (JSON)
+              │
+              ▼
+Auspice Visualization
 ```
 
 ---
+
 
 # Code Availability
 
