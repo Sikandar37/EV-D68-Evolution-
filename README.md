@@ -67,28 +67,33 @@ FASTA headers must match the `strain` column exactly.
 # Workflow Overview
 
 ## 1. Model Selection
+The best-fitting nucleotide substitution model was identified using IQ-TREE ModelFinder.
 
 ```bash
 iqtree2 -s EVD68_alignment.fasta -m TESTONLY
 ```
+The optimal substitution model was selected according to the Bayesian Information Criterion (BIC) and Akaike Information Criterion (AIC).
 
 ---
 
 ## 2. Maximum Likelihood Tree Reconstruction
-
+The maximum likelihood phylogeny was inferred using IQ-TREE with 1,000 ultrafast bootstrap replicates.
 ```bash
 iqtree2 -s EVD68_alignment.fasta -m GTR+F+I+G4 -bb 1000 -nt AUTO
 ```
 
-The resulting tree file (`EVD68.treefile`) is used for downstream analyses.
+The resulting tree file (`EVD68_alignment.fasta.treefile`) was used as the starting tree for temporal phylogenetic reconstruction in Nextstrain..
 
 ---
 
 ## 3. Time-Calibrated Phylogeny
-
+Activate the Nextstrain environment:
 ```bash
 nextstrain shell .
 
+Estimate the molecular clock and generate the time-scaled phylogeny.
+
+```bash
 augur refine \
     --tree EVD68.treefile \
     --alignment EVD68_alignment.fasta \
@@ -105,7 +110,7 @@ augur refine \
 ---
 
 ## 4. Trait Reconstruction
-
+Infer ancestral geographic traits and clade memberships.
 ```bash
 augur traits \
     --tree tree.nwk \
@@ -117,7 +122,7 @@ augur traits \
 ---
 
 ## 5. Ancestral Sequence Reconstruction
-
+Infer ancestral nucleotide sequences.
 ```bash
 augur ancestral \
     --tree tree.nwk \
@@ -125,11 +130,12 @@ augur ancestral \
     --output-node-data nt_muts.json \
     --inference joint
 ```
+This step identifies nucleotide substitutions occurring along each branch of the phylogeny
 
 ---
 
 ## 6. Amino Acid Mutation Inference
-
+Translate nucleotide substitutions into amino acid mutations.
 ```bash
 augur translate \
     --tree tree.nwk \
@@ -141,7 +147,7 @@ augur translate \
 ---
 
 ## 7. Export for Auspice
-
+Combine all inferred annotations into an Auspice-compatible JSON file.
 ```bash
 augur export v2 \
     --tree tree.nwk \
@@ -155,8 +161,7 @@ augur export v2 \
 ---
 
 ## 8. Visualization
-
-The resulting `EVD68.json` file can be visualized using Auspice:
+Open the Auspice web interface and upload the generated **EVD68.json** file to visualize:
 
 - Open https://auspice.us
 - Upload `EVD68.json`
@@ -201,6 +206,6 @@ Auspice Visualization
 
 # Code Availability
 
-All scripts and commands used for EV-D68 phylogenetic and evolutionary analysis are provided in this repository. The workflow is fully reproducible using the input files included here.
+All scripts and commands used for EV-D68 time-scaled phylogenetic analysis are provided in this repository. 
 
 ---
