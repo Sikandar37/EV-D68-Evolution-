@@ -90,6 +90,7 @@ The resulting tree file (`EVD68_alignment.fasta.treefile`) was used as the start
 Activate the Nextstrain environment:
 ```bash
 nextstrain shell .
+```
 
 Estimate the molecular clock and generate the time-scaled phylogeny.
 
