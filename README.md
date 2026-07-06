@@ -17,7 +17,6 @@ EV-D68-Evolution/
 ├── metadata.csv
 ├── reference.gb
 ├── colors.tsv
-├── lat_longs.tsv
 ├── auspice_config.json
 │
 ├── EVD68.treefile
@@ -43,7 +42,6 @@ The following input files are required to run the workflow:
 | `metadata.csv` | Sample metadata including collection date, country, region, and clade membership |
 | `reference.gb` | Annotated EV-D68 reference genome used for mutation annotation |
 | `colors.tsv` | Trait color definitions for Auspice visualization |
-| `lat_longs.tsv` | Geographic coordinates for visualization |
 | `auspice_config.json` | Configuration file for Auspice output |
 
 ---
@@ -150,7 +148,6 @@ augur export v2 \
     --metadata metadata.csv \
     --node-data branch_lengths.json traits.json nt_muts.json aa_muts.json \
     --colors colors.tsv \
-    --lat-longs lat_longs.tsv \
     --auspice-config auspice_config.json \
     --output EVD68.json
 ```
