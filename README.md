@@ -1,6 +1,6 @@
 # EV-D68-Evolution
 
-This repository contains the bioinformatics workflow used to reconstruct the evolutionary history of **Enterovirus D68 (EV-D68)** using maximum likelihood phylogenetic inference and the Nextstrain Augur pipeline.
+This repository contains the workflow used to reconstruct the evolutionary history of **Enterovirus D68 (EV-D68)** using maximum likelihood phylogenetic inference and the Nextstrain Augur pipeline.
 
 The workflow includes:
 
@@ -218,11 +218,7 @@ Auspice Visualization
 
 ---
 
-# Citation
 
-If you use this workflow in your research, please cite the associated publication describing the EV-D68 evolutionary analysis.
-
----
 
 # Code Availability
 
