@@ -1,101 +1,96 @@
-# EV-D68-Evolution
+# EV-D68 Evolutionary Analysis Pipeline
 
-This repository contains the workflow used to reconstruct the evolutionary history of **Enterovirus D68 (EV-D68)** using maximum likelihood phylogenetic inference and the Nextstrain Augur pipeline.
+This repository contains the complete workflow used to reconstruct the evolutionary history of **Enterovirus D68 (EV-D68)** using maximum likelihood phylogenetic inference and the Nextstrain Augur pipeline.
 
-The workflow includes:
-
-- Sequence alignment
-- Model selection
-- Maximum likelihood phylogenetic reconstruction
-- Time-calibrated phylogenetic analysis
-- Ancestral trait reconstruction
-- Nucleotide and amino acid mutation inference
-- Interactive visualization with Auspice
+The pipeline includes sequence alignment, model selection, phylogenetic reconstruction, temporal calibration, ancestral state reconstruction, mutation inference, and interactive visualization using Auspice.
 
 ---
 
-# Repository Structure
+# Repository Contents
+
+All input, configuration, and output files are stored in a single working directory.
 
 ```
 EV-D68-Evolution/
 │
-├── data/
-│   ├── metadata.csv
-│   └── sequences.fasta
+├── EVD68_alignment.fasta
+├── metadata.csv
+├── reference.gb
+├── colors.tsv
+├── lat_longs.tsv
+├── auspice_config.json
 │
-├── results/
-│
-├── config/
-│   ├── colors.tsv
-│   ├── lat_longs.tsv
-│   ├── auspice_config.json
-│   └── reference.gb
-│
-├── scripts/
-│
-├── auspice/
+├── EVD68.treefile
+├── tree.nwk
+├── branch_lengths.json
+├── traits.json
+├── nt_muts.json
+├── aa_muts.json
+├── EVD68.json
 │
 └── README.md
 ```
 
 ---
 
-# 1. Metadata Preparation
+# Input Data
 
-The metadata file (`metadata.csv`) contains epidemiological information associated with each EV-D68 genome.
+The following input files are required to run the workflow:
 
-Additional metadata fields include:
-
-- **country** – extracted from the sequence headers.
-- **region** – countries grouped into larger geographical regions (Asia, Europe, Africa, North America, South America, and Oceania).
-- **clade_membership** – assigned according to the study-specific clade classification.
-
-Example metadata:
-
-| strain | date | country | region | clade_membership |
-|--------|------------|---------|----------------|-----------------|
-| EVD68_001 | 2024-05-12 | Japan | Asia | B3 |
-| EVD68_002 | 2023-11-08 | USA | North America | A2 |
+| File | Description |
+|------|-------------|
+| `EVD68_alignment.fasta` | Multiple sequence alignment of EV-D68 nucleotide sequences |
+| `metadata.csv` | Sample metadata including collection date, country, region, and clade membership |
+| `reference.gb` | Annotated EV-D68 reference genome used for mutation annotation |
+| `colors.tsv` | Trait color definitions for Auspice visualization |
+| `lat_longs.tsv` | Geographic coordinates for visualization |
+| `auspice_config.json` | Configuration file for Auspice output |
 
 ---
 
-# 2. Maximum Likelihood Phylogenetic Analysis
+# Metadata Format
 
-## Model Selection
+The metadata file (`metadata.csv`) must contain one row per sequence.
 
-The best-fitting nucleotide substitution model was identified using IQ-TREE ModelFinder.
+Required columns:
+
+| Column | Description |
+|--------|-------------|
+| strain | Sequence identifier matching FASTA headers |
+| date | Collection date (YYYY-MM-DD or YYYY) |
+| country | Country of sample origin |
+| region | Broad geographic region |
+| clade_membership | Assigned EV-D68 clade |
+
+FASTA headers must match the `strain` column exactly.
+
+---
+
+# Workflow Overview
+
+## 1. Model Selection
 
 ```bash
 iqtree2 -s EVD68_alignment.fasta -m TESTONLY
 ```
 
-The optimal substitution model was selected according to the Bayesian Information Criterion (BIC) and Akaike Information Criterion (AIC).
-
 ---
 
-## Maximum Likelihood Tree Reconstruction
-
-The maximum likelihood phylogeny was inferred using IQ-TREE with 1,000 ultrafast bootstrap replicates.
+## 2. Maximum Likelihood Tree Reconstruction
 
 ```bash
 iqtree2 -s EVD68_alignment.fasta -m GTR+F+I+G4 -bb 1000 -nt AUTO
 ```
 
-The resulting tree file (`EVD68_alignment.fasta.treefile`) was used as the starting tree for temporal phylogenetic reconstruction in Nextstrain.
+The resulting tree file (`EVD68.treefile`) is used for downstream analyses.
 
 ---
 
-# 3. Time-Calibrated Phylogeny
-
-Activate the Nextstrain environment:
+## 3. Time-Calibrated Phylogeny
 
 ```bash
 nextstrain shell .
-```
 
-Estimate the molecular clock and generate the time-scaled phylogeny.
-
-```bash
 augur refine \
     --tree EVD68.treefile \
     --alignment EVD68_alignment.fasta \
@@ -111,9 +106,7 @@ augur refine \
 
 ---
 
-# 4. Trait Reconstruction
-
-Infer ancestral geographic traits and clade memberships.
+## 4. Trait Reconstruction
 
 ```bash
 augur traits \
@@ -125,9 +118,7 @@ augur traits \
 
 ---
 
-# 5. Ancestral Sequence Reconstruction
-
-Infer ancestral nucleotide sequences.
+## 5. Ancestral Sequence Reconstruction
 
 ```bash
 augur ancestral \
@@ -137,13 +128,9 @@ augur ancestral \
     --inference joint
 ```
 
-This step identifies nucleotide substitutions occurring along each branch of the phylogeny.
-
 ---
 
-# 6. Amino Acid Mutation Inference
-
-Translate nucleotide substitutions into amino acid mutations.
+## 6. Amino Acid Mutation Inference
 
 ```bash
 augur translate \
@@ -155,9 +142,7 @@ augur translate \
 
 ---
 
-# 7. Export for Auspice
-
-Combine all inferred annotations into an Auspice-compatible JSON file.
+## 7. Export for Auspice
 
 ```bash
 augur export v2 \
@@ -165,61 +150,34 @@ augur export v2 \
     --metadata metadata.csv \
     --node-data branch_lengths.json traits.json nt_muts.json aa_muts.json \
     --colors colors.tsv \
+    --lat-longs lat_longs.tsv \
     --auspice-config auspice_config.json \
-    --output auspice/EVD68.json
+    --output EVD68.json
 ```
 
 ---
 
-# 8. Interactive Visualization
+## 8. Visualization
 
-Open the Auspice web interface and upload the generated **EVD68.json** file to visualize:
+The resulting `EVD68.json` file can be visualized using Auspice:
 
-- Time-resolved phylogeny
-- Geographic spread
-- Ancestral trait reconstruction
-- Nucleotide mutations
-- Amino acid substitutions
+- Open https://auspice.us
+- Upload `EVD68.json`
+- Explore phylogeny, temporal dynamics, geographic spread, and mutations
 
 ---
 
-# 9. Workflow Summary
+# Workflow Summary
 
 ```
-Genome sequences
-       │
-       ▼
-Multiple sequence alignment
-       │
-       ▼
-IQ-TREE Model Selection
-       │
-       ▼
-Maximum Likelihood Tree
-       │
-       ▼
-Augur Refine
-(Time-calibrated tree)
-       │
-       ├─────────────┐
-       ▼             ▼
-Trait inference   Ancestral sequences
-       │             │
-       └──────┬──────┘
-              ▼
-Amino acid mutations
-              │
-              ▼
-Augur Export (JSON)
-              │
-              ▼
-Auspice Visualization
+Sequences → Alignment → IQ-TREE → Time Tree → Traits → Ancestral Reconstruction
+→ Amino Acid Changes → Auspice Export → Visualization
 ```
 
 ---
-
-
 
 # Code Availability
 
-The complete workflow used for EV-D68 phylogenetic reconstruction, temporal analysis, ancestral state reconstruction, mutation inference, and Auspice visualization is available in this repository.
+All scripts and commands used for EV-D68 phylogenetic and evolutionary analysis are provided in this repository. The workflow is fully reproducible using the input files included here.
+
+---
